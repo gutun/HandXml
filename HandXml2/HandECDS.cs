@@ -919,15 +919,15 @@ namespace HandXml2 {
         /// <param name="msgId"></param>
         /// <returns></returns>
         private static bool CheckMsgId(string msgId) {
-            //string sqlStr = System.Configuration.ConfigurationManager.AppSettings["sql"].ToString();
-            //string sql = string.Format(sqlStr, msgId);
-            //string result = CommonHelper.Context("ECDS").Sql(sql).QuerySingle<string>();
-            //return !string.IsNullOrEmpty(result);
+            string sqlStr = System.Configuration.ConfigurationManager.AppSettings["sql"].ToString();
+            string sql = string.Format(sqlStr, msgId);
+            string result = CommonHelper.Context("ECDS").Sql(sql).QuerySingle<string>();
+            return !string.IsNullOrEmpty(result);
             return true;
         }
 
         private static bool CheckMsgId(string msgId, string sql) {
-            //return CommonHelper.Context("ECDS").Sql(sql).QueryMany<dynamic>().Count > 0;
+            return CommonHelper.Context("ECDS").Sql(sql).QueryMany<dynamic>().Count > 0;
             return true;
         }
 

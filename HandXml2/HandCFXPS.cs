@@ -163,8 +163,8 @@ namespace HandXml2 {
 
         private static bool GetDbResult(string dbName, string sql) {
 
-            //bool result = CommonHelper.Context(dbName.ToUpper()).Sql(sql).QueryMany<dynamic>().Count > 0;
-            //return result;
+            bool result = CommonHelper.Context(dbName.ToUpper()).Sql(sql).QueryMany<dynamic>().Count > 0;
+            return result;
             return true;
         }
 
