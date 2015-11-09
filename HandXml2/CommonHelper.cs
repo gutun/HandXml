@@ -124,7 +124,7 @@ namespace HandXml2 {
                 string fullSaveDir = AppDomain.CurrentDomain.BaseDirectory + "Logs//";
                 if (!Directory.Exists(fullSaveDir))
                     Directory.CreateDirectory(fullSaveDir);
-                string filepath = string.Format("{0}{1}.txt", fullSaveDir, FileName + ".txt");
+                string filepath = string.Format("{0}{1}.txt", fullSaveDir, FileName);
                 System.IO.File.AppendAllText(filepath, msg);
             } catch (Exception) {
             }

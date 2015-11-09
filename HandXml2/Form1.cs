@@ -70,6 +70,10 @@ namespace HandXml2 {
 
         private void button1_Click(object sender, EventArgs e) {
             RichTextBox txtbox = this.richTextBox2;
+            string floder = AppDomain.CurrentDomain.BaseDirectory + "Logs//";
+            if (Directory.Exists(floder)) {
+                Directory.Delete(floder, true);
+            }
             OpenFileDialog fileDialog = new OpenFileDialog();
             //筛选
             fileDialog.Multiselect = true;
@@ -93,6 +97,10 @@ namespace HandXml2 {
 
         private void button2_Click(object sender, EventArgs e) {
             RichTextBox txtbox = this.richTextBox3;
+            string floder = AppDomain.CurrentDomain.BaseDirectory + "Logs//";
+            if (Directory.Exists(floder)) {
+                Directory.Delete(floder, true);
+            }
             OpenFileDialog fileDialog = new OpenFileDialog();
             //筛选
             fileDialog.Multiselect = true;
