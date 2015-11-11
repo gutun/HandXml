@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace HandXml2 {
     public static class HandCFXPS {
@@ -38,7 +39,7 @@ namespace HandXml2 {
                         DataRow row = resultTable.Rows[i];
                         //验收项目编号
                         string ysalbh = row["验收案例编号"].ToString();
-                        if (ysalbh == "FMT199_002") {
+                        if (ysalbh == "FMT100_001") {
                             bool flag = true;
                         }
                         //提交项目
@@ -75,9 +76,9 @@ namespace HandXml2 {
                                                 string[] itemtjnrlines = itemRow["提交内容"].ToString().Replace("\r", "").Split('\n').Where(x => !string.IsNullOrEmpty(x.Trim())).ToArray();
                                                 for (int lineindex = 0; lineindex <= itemtjnrxlines.Length - 1; lineindex++) {
                                                     //提交项目
-                                                    string itemtjnrx = itemtjnrxlines[lineindex].ToString();
+                                                    string itemtjnrx = itemtjnrxlines[lineindex].Trim().ToString();
                                                     //提交内容	
-                                                    string itemtjnr = itemtjnrlines[lineindex].ToString();
+                                                    string itemtjnr = itemtjnrlines[lineindex].Trim().ToString();
                                                     if (!string.IsNullOrEmpty(itemtjnrx) && !string.IsNullOrEmpty(itemtjnr)) {
                                                         if (itemtjnrx.IndexOf(')') > -1) {
                                                             itemtjnrx = itemtjnrx.Substring(itemtjnrx.IndexOf(')') + 1);
@@ -87,10 +88,11 @@ namespace HandXml2 {
                                                         itemtjnrx = itemtjnrx.Replace("：", "").Trim();
                                                         if (sql.IndexOf("TXID='报文标识号'") > -1 && itemtjnrx.Equals("报文标识号")) {
                                                             sql = sql.Replace("TXID='报文标识号'", "TXID='" + itemtjnr.Trim().Substring(itemtjnr.Trim().Length - 8, 8) + "'");
-                                                        } else if (sql.IndexOf("CURCODE='外币种类'") > -1) {
-                                                            sql = sql.Replace("CURCODE='外币种类'", "CURCODE = '" + resultTable.TableName.Replace("案例", "").Trim() + "'");
                                                         } else {
                                                             sql = sql.Replace("'" + itemtjnrx + "'", "'" + itemtjnr + "'");
+                                                        }
+                                                        if (sql.IndexOf("CURCODE='外币种类'") > -1) {
+                                                            sql = sql.Replace("CURCODE='外币种类'", "CURCODE = '" + Regex.Replace(resultTable.TableName, @"[^a-zA-Z]", "").Trim() + "'");
                                                         }
                                                     }
                                                 }
@@ -102,6 +104,7 @@ namespace HandXml2 {
                                         try {
                                             bool sqlResult = GetDbResult(sqlInfo[1], sql);
                                             resultTableRow["result"] = sqlResult ? "通过" : "不通过";
+                                            resultTableRow["log"] = "sql执行" + sqlResult;
                                             textbox.WriteLine("sql执行结果:" + sqlResult);
                                         } catch (Exception ex) {
                                             resultTableRow["log"] = ex.Message;
@@ -125,6 +128,7 @@ namespace HandXml2 {
                     }
                     //保存结果到Excel中
                     resultSet.Tables.Add(resultTable.Copy());
+                    resultTable.Dispose();
                 }
                 int totlergcount = 0;
                 int totalokcount = 0;
@@ -148,6 +152,7 @@ namespace HandXml2 {
                     totalerrorcount += cwlist.Count;
                     foreach (var item in cwlist) {
                         CommonHelper.WriteLog(item.Field<string>("验收案例编号") + Environment.NewLine);
+                        CommonHelper.WriteLog(item.Field<string>("sql") + Environment.NewLine);
                         CommonHelper.WriteLog(item.Field<string>("log") + Environment.NewLine);
                     }
                     CommonHelper.WriteLog(table.TableName + "错误案例:" + cwlist.Count);
@@ -234,8 +239,14 @@ namespace HandXml2 {
                             celldb.PutValue(db);
                             Style styleanli = celldb.GetStyle();
                             styleanli.Pattern = BackgroundType.Solid;
-                            styleanli.ForegroundColor = db.Equals("不通过") ? Color.Red : Color.Green;
-                            celldb.SetStyle(styleanli);
+                            if (db.Equals("不通过")) {
+                                styleanli.ForegroundColor = Color.Red;
+                                celldb.SetStyle(styleanli);
+                            } else if (db.Equals("通过")) {
+                                styleanli.ForegroundColor = Color.Green;
+                                celldb.SetStyle(styleanli);
+                            } else { }
+
                         }
                     }
                 }

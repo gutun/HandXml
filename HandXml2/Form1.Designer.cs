@@ -76,8 +76,11 @@
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.ItemSize = new System.Drawing.Size(200, 30);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(5);
             this.tabControl1.Name = "tabControl1";
+            this.tabControl1.Padding = new System.Drawing.Point(20, 3);
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1325, 846);
             this.tabControl1.TabIndex = 9;
@@ -85,10 +88,10 @@
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.splitContainer1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Location = new System.Drawing.Point(4, 34);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1317, 820);
+            this.tabPage1.Size = new System.Drawing.Size(1317, 808);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "ECDS";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -108,8 +111,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.richTextBox1);
-            this.splitContainer1.Size = new System.Drawing.Size(1311, 814);
-            this.splitContainer1.SplitterDistance = 133;
+            this.splitContainer1.Size = new System.Drawing.Size(1311, 802);
+            this.splitContainer1.SplitterDistance = 131;
             this.splitContainer1.TabIndex = 12;
             // 
             // btnHand
@@ -184,7 +187,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(538, 25);
+            this.label7.Location = new System.Drawing.Point(538, 80);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(65, 12);
             this.label7.TabIndex = 8;
@@ -207,7 +210,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(526, 77);
+            this.label3.Location = new System.Drawing.Point(526, 23);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(77, 12);
             this.label3.TabIndex = 6;
@@ -249,17 +252,17 @@
             this.richTextBox1.Location = new System.Drawing.Point(0, 0);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.richTextBox1.Size = new System.Drawing.Size(1311, 677);
+            this.richTextBox1.Size = new System.Drawing.Size(1311, 667);
             this.richTextBox1.TabIndex = 11;
             this.richTextBox1.Text = "结果显示在这里!";
             // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.splitContainer2);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Location = new System.Drawing.Point(4, 34);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1317, 820);
+            this.tabPage2.Size = new System.Drawing.Size(1317, 808);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "IBPS/BEPS/HVPS";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -278,8 +281,8 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.richTextBox2);
-            this.splitContainer2.Size = new System.Drawing.Size(1311, 814);
-            this.splitContainer2.SplitterDistance = 80;
+            this.splitContainer2.Size = new System.Drawing.Size(1311, 802);
+            this.splitContainer2.SplitterDistance = 78;
             this.splitContainer2.TabIndex = 13;
             // 
             // button1
@@ -301,17 +304,17 @@
             this.richTextBox2.ForeColor = System.Drawing.Color.Black;
             this.richTextBox2.Location = new System.Drawing.Point(0, 0);
             this.richTextBox2.Name = "richTextBox2";
-            this.richTextBox2.Size = new System.Drawing.Size(1311, 730);
+            this.richTextBox2.Size = new System.Drawing.Size(1311, 720);
             this.richTextBox2.TabIndex = 12;
             this.richTextBox2.Text = "结果显示在这里!";
             // 
             // tabPage3
             // 
             this.tabPage3.Controls.Add(this.splitContainer3);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Location = new System.Drawing.Point(4, 34);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1317, 820);
+            this.tabPage3.Size = new System.Drawing.Size(1317, 808);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "CFXPS";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -331,8 +334,8 @@
             // splitContainer3.Panel2
             // 
             this.splitContainer3.Panel2.Controls.Add(this.richTextBox3);
-            this.splitContainer3.Size = new System.Drawing.Size(1311, 814);
-            this.splitContainer3.SplitterDistance = 94;
+            this.splitContainer3.Size = new System.Drawing.Size(1311, 802);
+            this.splitContainer3.SplitterDistance = 92;
             this.splitContainer3.TabIndex = 16;
             // 
             // checkedListBox1
@@ -365,7 +368,7 @@
             this.richTextBox3.Location = new System.Drawing.Point(0, 0);
             this.richTextBox3.Name = "richTextBox3";
             this.richTextBox3.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.richTextBox3.Size = new System.Drawing.Size(1311, 716);
+            this.richTextBox3.Size = new System.Drawing.Size(1311, 706);
             this.richTextBox3.TabIndex = 15;
             this.richTextBox3.Text = "结果显示在这里!";
             // 

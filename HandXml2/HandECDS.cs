@@ -55,8 +55,8 @@ namespace HandXml2 {
 
                         if (!string.IsNullOrEmpty(ysxmbh) && !string.IsNullOrEmpty(tjnr)) {
                             textbox.WriteLine("验收项目编号:" + ysxmbh);
-                            if (ysxmbh == "ZR_ECDS123_001") {
-
+                            if (ysxmbh == "ZR_ECDS031_007") {
+                                var flag = true;
                             }
                             //报文规则
                             string[] nodeRules = bwgz.Split(new string[] { ",", "，" }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
@@ -440,7 +440,6 @@ namespace HandXml2 {
                                         }
                                         row["MsgId日志"] = sbmsgidlog.ToString();
                                         row["数据库日志"] = sbdblog.ToString();
-                                        row["MsgId"] = string.Join(",", msgIdList.ToArray());
                                         #endregion
                                     } else {
                                         row["数据库检测结果"] = false ? "通过" : "不通过";

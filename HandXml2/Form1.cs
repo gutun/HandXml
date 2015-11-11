@@ -12,7 +12,6 @@ using System.Windows.Forms;
 namespace HandXml2 {
     public partial class Form1 : Form {
         public Form1() {
-
             InitializeComponent();
             string sheet = ConfigurationManager.AppSettings["sheet"];
             if (!string.IsNullOrEmpty(sheet)) {
