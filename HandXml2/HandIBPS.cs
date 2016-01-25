@@ -9,7 +9,7 @@ using System.Text;
 
 namespace HandXml2 {
     public static class HandIBPS {
-        public static void HandFile(System.Windows.Forms.RichTextBox textbox, string excelfile, string txtfile) {
+        public static void HandFile(System.Windows.Forms.RichTextBox textbox, string excelfile, string txtfile, bool ignoreflag) {
             textbox.Clear();
             try {
                 //读取Excel到内存中
@@ -24,8 +24,15 @@ namespace HandXml2 {
                 //匹配Excel每一行
                 for (int i = 0; i < table.Rows.Count; i++) {
                     DataRow row = table.Rows[i];
+                    if (ignoreflag && ((table.Columns.Contains("是否通过")&&row["是否通过"].ToString().Equals("通过"))|| (table.Columns.Contains("是否"+Environment.NewLine+"通过") && row["是否" + Environment.NewLine + "通过"].ToString().Equals("通过")))) {
+                        continue;
+                    }
                     //验收项目编号
                     string ysalbh = row["验收案例编号"].ToString();
+                    if (ysalbh=="M3_CCMS.801_001")
+                    {
+                        
+                    }
                     //提交内容项
                     string tjnrx = row["提交内容项"].ToString();
                     //提交内容	
@@ -66,11 +73,7 @@ namespace HandXml2 {
                                                 if (!string.IsNullOrEmpty(itemtjnrx) && !string.IsNullOrEmpty(itemtjnr)) {
                                                     itemtjnrx = itemtjnrx.Substring(itemtjnrx.IndexOf(')') + 1);
                                                     itemtjnrx = itemtjnrx.Replace("：", "").Trim();
-                                                    if (sql.IndexOf("TXID='报文标识号'") > -1 && itemtjnrx.Equals("报文标识号")) {
-                                                        sql = sql.Replace("TXID='报文标识号'", "TXID='" + itemtjnr.Trim().Substring(itemtjnr.Trim().Length - 8, 8) + "'");
-                                                    } else {
-                                                        sql = sql.Replace("'" + itemtjnrx + "'", "'" + itemtjnr + "'");
-                                                    }
+                                                    sql=CommonHelper.HandString(sql,itemtjnrx,itemtjnr);
                                                 }
                                             }
                                             itemIndex++;
@@ -184,6 +187,8 @@ namespace HandXml2 {
             return true;
         }
 
+       
+
         public static void SaveExcel(string file, string sheetName, DataTable table) {
             Workbook wkBook = new Workbook();
             wkBook.Open(file);
@@ -192,7 +197,12 @@ namespace HandXml2 {
             foreach (DataRow row in table.Rows) {
                 if (!DBNull.Value.Equals(row["index"]) && !DBNull.Value.Equals(row["result"])) {
                     int x = Convert.ToInt32(row["index"]);
-                    Cell celldb = wkSheet.Cells[x, table.Columns["是否通过"].Ordinal];
+                    Cell celldb = null;
+                    if (table.Columns.Contains("是否通过")) {
+                        celldb = wkSheet.Cells[x, table.Columns["是否通过"].Ordinal];
+                    } else if (table.Columns.Contains("是否" + Environment.NewLine + "通过")) {
+                        celldb = wkSheet.Cells[x, table.Columns["是否" + Environment.NewLine + "通过"].Ordinal];
+                    }
                     string db = row["result"].ToString();
                     if (!string.IsNullOrEmpty(db)) {
                         celldb.PutValue(db);

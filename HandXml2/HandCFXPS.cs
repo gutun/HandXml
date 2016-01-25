@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace HandXml2 {
     public static class HandCFXPS {
-        public static void HandFile(System.Windows.Forms.RichTextBox textbox, string excelfile, string txtfile, List<string> sheets) {
+        public static void HandFile(System.Windows.Forms.RichTextBox textbox, string excelfile, string txtfile, List<string> sheets, bool ignoreflag) {
             textbox.Clear();
             try {
                 DataSet dataset = new DataSet();
@@ -37,11 +37,14 @@ namespace HandXml2 {
                     //匹配Excel每一行
                     for (int i = 0; i < resultTable.Rows.Count; i++) {
                         DataRow row = resultTable.Rows[i];
+                        if (ignoreflag && ((resultTable.Columns.Contains("是否通过") && row["是否通过"].ToString().Equals("通过")) || (resultTable.Columns.Contains("是否" + Environment.NewLine + "通过") && row["是否" + Environment.NewLine + "通过"].ToString().Equals("通过")))) {
+                            continue;
+                        }
                         //验收项目编号
                         string ysalbh = row["验收案例编号"].ToString();
-                        if (ysalbh == "FMT100_001") {
-                            bool flag = true;
-                        }
+                        //if (ysalbh == "FMT100_001") {
+                        //    bool flag = true;
+                        //}
                         //提交项目
                         string tjnrx = row["提交项目"].ToString();
                         //提交内容	
@@ -86,11 +89,7 @@ namespace HandXml2 {
                                                             itemtjnrx = itemtjnrx.Substring(itemtjnrx.IndexOf('）') + 1);
                                                         }
                                                         itemtjnrx = itemtjnrx.Replace("：", "").Trim();
-                                                        if (sql.IndexOf("TXID='报文标识号'") > -1 && itemtjnrx.Equals("报文标识号")) {
-                                                            sql = sql.Replace("TXID='报文标识号'", "TXID='" + itemtjnr.Trim().Substring(itemtjnr.Trim().Length - 8, 8) + "'");
-                                                        } else {
-                                                            sql = sql.Replace("'" + itemtjnrx + "'", "'" + itemtjnr + "'");
-                                                        }
+                                                        sql = CommonHelper.HandString(sql, itemtjnrx, itemtjnr);
                                                         if (sql.IndexOf("CURCODE='外币种类'") > -1) {
                                                             sql = sql.Replace("CURCODE='外币种类'", "CURCODE = '" + Regex.Replace(resultTable.TableName, @"[^a-zA-Z]", "").Trim() + "'");
                                                         }
@@ -233,7 +232,12 @@ namespace HandXml2 {
                 foreach (DataRow row in table.Rows) {
                     if (!DBNull.Value.Equals(row["index"]) && !DBNull.Value.Equals(row["result"])) {
                         int x = Convert.ToInt32(row["index"]);
-                        Cell celldb = wkSheet.Cells[x, table.Columns["是否通过"].Ordinal];
+                        Cell celldb = null;
+                        if (table.Columns.Contains("是否通过")) {
+                            celldb = wkSheet.Cells[x, table.Columns["是否通过"].Ordinal];
+                        } else if (table.Columns.Contains("是否" + Environment.NewLine + "通过")) {
+                            celldb = wkSheet.Cells[x, table.Columns["是否"+Environment.NewLine+"通过"].Ordinal];
+                        }
                         string db = row["result"].ToString();
                         if (!string.IsNullOrEmpty(db)) {
                             celldb.PutValue(db);

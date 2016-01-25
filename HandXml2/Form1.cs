@@ -24,6 +24,7 @@ namespace HandXml2 {
         }
 
         private void btnHand_Click_1(object sender, EventArgs e) {
+            bool ignoreflag = this.checkBox1.Checked;
             RichTextBox txtbox = this.richTextBox1;
             string floder = AppDomain.CurrentDomain.BaseDirectory + "Logs//";
             if (Directory.Exists(floder)) {
@@ -58,7 +59,7 @@ namespace HandXml2 {
                         excelFile = fileDialog.FileNames[0];
                     }
                     //显示选择文件
-                    HandECDS.HandFile(txtbox, excelFile, txtFile, dic);
+                    HandECDS.HandFile(txtbox, excelFile, txtFile, dic, ignoreflag);
                 } else {
                     MessageBox.Show("请选择文件!");
                 }
@@ -68,6 +69,7 @@ namespace HandXml2 {
         }
 
         private void button1_Click(object sender, EventArgs e) {
+            bool ignoreflag = this.checkBox2.Checked;
             RichTextBox txtbox = this.richTextBox2;
             string floder = AppDomain.CurrentDomain.BaseDirectory + "Logs//";
             if (Directory.Exists(floder)) {
@@ -87,7 +89,7 @@ namespace HandXml2 {
                     excelFile = fileDialog.FileNames[0];
                 }
                 //显示选择文件
-                HandIBPS.HandFile(txtbox, excelFile, txtFile);
+                HandIBPS.HandFile(txtbox, excelFile, txtFile, ignoreflag);
 
             } else {
                 MessageBox.Show("请选择文件!");
@@ -95,6 +97,7 @@ namespace HandXml2 {
         }
 
         private void button2_Click(object sender, EventArgs e) {
+            bool ignoreflag = this.checkBox3.Checked;
             RichTextBox txtbox = this.richTextBox3;
             string floder = AppDomain.CurrentDomain.BaseDirectory + "Logs//";
             if (Directory.Exists(floder)) {
@@ -118,7 +121,7 @@ namespace HandXml2 {
                     excelFile = fileDialog.FileNames[0];
                 }
                 //显示选择文件
-                HandCFXPS.HandFile(txtbox, excelFile, txtFile,sheets);
+                HandCFXPS.HandFile(txtbox, excelFile, txtFile,sheets,ignoreflag);
 
             } else {
                 MessageBox.Show("请选择文件!");

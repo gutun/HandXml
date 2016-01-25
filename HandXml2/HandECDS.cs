@@ -18,7 +18,7 @@ namespace HandXml2 {
         /// </summary>
         /// <param name="textbox">程序界面的文本框,用于输出日志</param>
         /// <param name="file">要处理的Excel文件</param>
-        public static void HandFile(System.Windows.Forms.RichTextBox textbox, string file, string txtfile, Dictionary<string, string[]> dic) {
+        public static void HandFile(System.Windows.Forms.RichTextBox textbox, string file, string txtfile, Dictionary<string, string[]> dic,bool ignoreflag) {
             textbox.Clear();
             try {
                 //读取Excel到内存中
@@ -36,6 +36,9 @@ namespace HandXml2 {
                 for (int i = 0; i < table.Rows.Count; i++) {
                     try {
                         DataRow row = table.Rows[i];
+                        if (ignoreflag && row["案例检测结果"].ToString().Equals("通过")) {
+                            continue;
+                        }
                         //验收项目编号
                         string ysxmbh = row["验收项目编号"].ToString();
                         //节点路由
