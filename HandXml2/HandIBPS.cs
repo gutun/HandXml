@@ -20,19 +20,17 @@ namespace HandXml2 {
                 resultTable.Columns.Add("index", typeof(int));
                 resultTable.Columns.Add("sql", typeof(string));
                 resultTable.Columns.Add("result", typeof(string));
+                resultTable.Columns.Add("filetype", typeof(string));
+                resultTable.Columns.Add("baowenbiaoshihao", typeof(string));
                 resultTable.Columns.Add("log", typeof(string));
                 //匹配Excel每一行
                 for (int i = 0; i < table.Rows.Count; i++) {
                     DataRow row = table.Rows[i];
-                    if (ignoreflag && ((table.Columns.Contains("是否通过")&&row["是否通过"].ToString().Equals("通过"))|| (table.Columns.Contains("是否"+Environment.NewLine+"通过") && row["是否" + Environment.NewLine + "通过"].ToString().Equals("通过")))) {
+                    if (ignoreflag && ((table.Columns.Contains("是否通过") && row["是否通过"].ToString().Equals("通过")) || (table.Columns.Contains("是否" + Environment.NewLine + "通过") && row["是否" + Environment.NewLine + "通过"].ToString().Equals("通过")))) {
                         continue;
                     }
                     //验收项目编号
                     string ysalbh = row["验收案例编号"].ToString();
-                    if (ysalbh=="M3_CCMS.801_001")
-                    {
-                        
-                    }
                     //提交内容项
                     string tjnrx = row["提交内容项"].ToString();
                     //提交内容	
@@ -52,13 +50,16 @@ namespace HandXml2 {
                             } else {
                                 DataRow resultTableRow = resultTable.Rows[i];
                                 resultTableRow["index"] = i + titleRowIndex + 1;
-                                if (dbresult[ysalbh].Length == 3) {
+                                if (dbresult[ysalbh].Length == 4) {
                                     string[] sqlInfo = null;
                                     string sql = string.Empty;
+                                    string filetypeName = string.Empty;
                                     bool sqlresult = dbresult.TryGetValue(ysalbh, out sqlInfo);
                                     int itemIndex = 0;
                                     if (sqlresult && null != sqlInfo && sqlInfo.Length > 0) {
-                                        sql = sqlInfo[2];
+                                        sql = sqlInfo[3];
+                                        filetypeName = sqlInfo[1];
+                                        resultTableRow["filetype"] = filetypeName;
                                         do {
                                             DataRow itemRow = table.Rows[i + itemIndex];
                                             //验收项目编号
@@ -73,7 +74,10 @@ namespace HandXml2 {
                                                 if (!string.IsNullOrEmpty(itemtjnrx) && !string.IsNullOrEmpty(itemtjnr)) {
                                                     itemtjnrx = itemtjnrx.Substring(itemtjnrx.IndexOf(')') + 1);
                                                     itemtjnrx = itemtjnrx.Replace("：", "").Trim();
-                                                    sql=CommonHelper.HandString(sql,itemtjnrx,itemtjnr);
+                                                    sql = CommonHelper.HandString(sql, itemtjnrx, itemtjnr);
+                                                    if (itemIndex == 0) {
+                                                        resultTableRow["baowenbiaoshihao"] = itemtjnr;
+                                                    }
                                                 }
                                             }
                                             itemIndex++;
@@ -82,7 +86,7 @@ namespace HandXml2 {
                                     textbox.WriteLine("sql语句:" + sql);
                                     resultTableRow["sql"] = sql;
                                     try {
-                                        bool sqlResult = GetDbResult(sqlInfo[1], sql);
+                                        bool sqlResult = GetDbResult(sqlInfo[2], sql);
                                         resultTableRow["result"] = sqlResult ? "通过" : "不通过";
                                         resultTableRow["log"] = "sql执行" + sqlResult;
                                         textbox.WriteLine("sql执行结果:" + sqlResult);
@@ -92,6 +96,37 @@ namespace HandXml2 {
                                         textbox.WriteLine("sql执行结果:" + ex.Message);
                                     }
                                 } else {
+                                    if (dbresult[ysalbh].Length >= 2) {
+                                        string[] sqlInfo = null;
+                                        string filetypeName = string.Empty;
+                                        bool sqlresult = dbresult.TryGetValue(ysalbh, out sqlInfo);
+                                        int itemIndex = 0;
+                                        if (sqlresult && null != sqlInfo && sqlInfo.Length > 0) {
+                                            filetypeName = sqlInfo[1];
+                                            resultTableRow["filetype"] = filetypeName;
+                                        }
+                                        do {
+                                            DataRow itemRow = table.Rows[i + itemIndex];
+                                            //验收项目编号
+                                            string itemysalbh = itemRow["验收案例编号"].ToString();
+                                            string[] itemtjnrxlines = itemRow["提交内容项"].ToString().Replace("\r", "").Split('\n').Where(x => !string.IsNullOrEmpty(x.Trim())).ToArray();
+                                            string[] itemtjnrlines = itemRow["提交内容"].ToString().Replace("\r", "").Split('\n').Where(x => !string.IsNullOrEmpty(x.Trim())).ToArray();
+                                            for (int lineindex = 0; lineindex <= itemtjnrxlines.Length - 1; lineindex++) {
+                                                //提交内容项
+                                                string itemtjnrx = itemtjnrxlines[lineindex].ToString();
+                                                //提交内容	
+                                                string itemtjnr = itemtjnrlines[lineindex].ToString();
+                                                if (!string.IsNullOrEmpty(itemtjnrx) && !string.IsNullOrEmpty(itemtjnr)) {
+                                                    itemtjnrx = itemtjnrx.Substring(itemtjnrx.IndexOf(')') + 1);
+                                                    itemtjnrx = itemtjnrx.Replace("：", "").Trim();
+                                                    if (itemIndex == 0) {
+                                                        resultTableRow["baowenbiaoshihao"] = itemtjnr;
+                                                    }
+                                                }
+                                            }
+                                            itemIndex++;
+                                        } while (i + itemIndex < table.Rows.Count && string.IsNullOrEmpty(table.Rows[i + itemIndex]["验收案例编号"].ToString()));
+                                    }
                                     resultTableRow["result"] = "人工处理";
                                     textbox.WriteLine("人工处理");
                                 }
@@ -106,15 +141,26 @@ namespace HandXml2 {
 
                     }
                 }
-
-                CommonHelper.FileName = "人工处理";
-                var rengonglist = (from myRow in resultTable.AsEnumerable()
-                                   where !string.IsNullOrEmpty(myRow.Field<string>("result")) && myRow.Field<string>("result").Trim().Equals("人工处理")
-                                   select myRow).ToList();
-                foreach (var item in rengonglist) {
-                    CommonHelper.WriteLog(item.Field<string>("验收案例编号") + Environment.NewLine);
+                List<string> fileTypes = new List<string>();
+                foreach (var item in dbresult.Keys) {
+                    if (dbresult[item].Length >= 2) {
+                        string filetypeName = dbresult[item][1];
+                        if (!fileTypes.Contains(filetypeName)) {
+                            fileTypes.Add(filetypeName);
+                        }
+                    }
                 }
-                CommonHelper.WriteLog("人工处理:" + rengonglist.Count);
+                foreach (var fileType in fileTypes) {
+                    CommonHelper.FileName = fileType;
+                    var rengonglist = (from myRow in resultTable.AsEnumerable()
+                                       where !string.IsNullOrEmpty(myRow.Field<string>("filetype")) && myRow.Field<string>("filetype").Trim().Equals(fileType)
+                                       select myRow).ToList();
+                    foreach (var item in rengonglist) {
+                        CommonHelper.WriteLog(item.Field<string>("验收案例编号") + " " + item.Field<string>("baowenbiaoshihao") + Environment.NewLine);
+                    }
+                    CommonHelper.WriteLog(fileType + ":" + rengonglist.Count);
+                    textbox.WriteLine(fileType + ":总数:" + rengonglist.Count);
+                }
                 //-----------------------
                 CommonHelper.FileName = "错误案例";
                 var cwlist = (from myRow in resultTable.AsEnumerable()
@@ -132,7 +178,6 @@ namespace HandXml2 {
                               where !string.IsNullOrEmpty(myRow.Field<string>("result")) && myRow.Field<string>("result").Trim().Equals("通过")
                               select myRow).ToList();
                 textbox.WriteLine("正确案例:" + zqlist.Count);
-                textbox.WriteLine("人工处理总数:" + rengonglist.Count);
                 textbox.WriteLine("失败案例总数:" + cwlist.Count);
                 textbox.WriteLine("正确案例总数:" + zqlist.Count);
                 //保存结果到Excel中
@@ -187,7 +232,7 @@ namespace HandXml2 {
             return true;
         }
 
-       
+
 
         public static void SaveExcel(string file, string sheetName, DataTable table) {
             Workbook wkBook = new Workbook();
