@@ -77,9 +77,14 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="HandBEPS.cs" />
     <Compile Include="HandCFXPS.cs" />
+    <Compile Include="HandCIPS.cs" />
+    <Compile Include="HandCIS.cs" />
     <Compile Include="HandECDS.cs" />
+    <Compile Include="HandHVPS.cs" />
     <Compile Include="HandIBPS.cs" />
+    <Compile Include="HandIBPSNEW.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

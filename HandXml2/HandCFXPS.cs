@@ -195,7 +195,10 @@ namespace HandXml2 {
                             CommonHelper.WriteLog(item.Field<string>("验收案例编号") + " " + item.Field<string>("baowenbiaoshihao") + Environment.NewLine);
                         }
                         CommonHelper.WriteLog(table.TableName + fileType + ":" + rengonglist.Count);
-                        textbox.WriteLine(table.TableName + fileType + ":总数:" + rengonglist.Count);
+                        if (fileType.Trim() == "人工处理")
+                        {
+                            textbox.WriteLine(table.TableName + fileType + ":" + rengonglist.Count);
+                        }
                     }
                     //-----------------------
                     CommonHelper.FileName = table.TableName + "错误案例";
@@ -219,9 +222,9 @@ namespace HandXml2 {
                     textbox.WriteLine(table.TableName + "正确案例:" + zqlist.Count);
                     CommonHelper.WriteLog(table.TableName + "正确案例:" + zqlist.Count);
                 }
-                textbox.WriteLine("人工处理总数:" + totlergcount);
-                textbox.WriteLine("失败案例总数:" + totalerrorcount);
-                textbox.WriteLine("正确案例总数:" + totalokcount);
+                //textbox.WriteLine("人工处理总数:" + totlergcount);
+                //textbox.WriteLine("失败案例总数:" + totalerrorcount);
+                //textbox.WriteLine("正确案例总数:" + totalokcount);
 
 
 
