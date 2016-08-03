@@ -66,7 +66,7 @@ namespace HandXml2
                     for (int i = 0; i < resultTable.Rows.Count; i++)
                     {
                         DataRow row = resultTable.Rows[i];
-                        if (ignoreflag && ((resultTable.Columns.Contains("是否通过") && row["是否通过"].ToString().Equals("通过")) || (resultTable.Columns.Contains("是否" + Environment.NewLine + "通过") && row["是否" + Environment.NewLine + "通过"].ToString().Equals("通过"))))
+                        if (ignoreflag && ((resultTable.Columns.Contains("是否通过") && row["是否通过"].ToString().Equals("通过")) || (resultTable.Columns.Contains("是否\n通过") && row["是否\n通过"].ToString().Equals("通过"))))
                         {
                             continue;
                         }
@@ -125,7 +125,7 @@ namespace HandXml2
                                                     {
                                                         itemtjnrx = itemtjnrx.Substring(itemtjnrx.IndexOf(')') + 1);
                                                         itemtjnrx = itemtjnrx.Replace("：", "").Replace(":", "").Trim();
-                                                        sql = CommonHelper.HandString(sql, itemtjnrx, itemtjnr);
+                                                        sql =  CommonHelper.HandString(sql, "'" + itemtjnrx, itemtjnr);
                                                         if (itemIndex == 0)
                                                         {
                                                             resultTableRow["baowenbiaoshihao"] = itemtjnr;
@@ -274,7 +274,8 @@ namespace HandXml2
         {
             foreach (var item in files)
             {
-                if (Path.GetFileNameWithoutExtension(item).Equals(sheetName, StringComparison.OrdinalIgnoreCase))
+                string filename = Path.GetFileNameWithoutExtension(item);
+                if (filename.Equals(sheetName, StringComparison.OrdinalIgnoreCase))
                 {
                     return item;
                 }
@@ -347,9 +348,9 @@ namespace HandXml2
                         {
                             celldb = wkSheet.Cells[x, table.Columns["是否通过"].Ordinal];
                         }
-                        else if (table.Columns.Contains("是否" + Environment.NewLine + "通过"))
+                        else if (table.Columns.Contains("是否\n通过"))
                         {
-                            celldb = wkSheet.Cells[x, table.Columns["是否" + Environment.NewLine + "通过"].Ordinal];
+                            celldb = wkSheet.Cells[x, table.Columns["是否\n通过"].Ordinal];
                         }
                         string db = row["result"].ToString();
                         if (!string.IsNullOrEmpty(db))

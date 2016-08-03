@@ -13,9 +13,15 @@ namespace HandXml2
 {
     public partial class Form1 : Form
     {
+        public BackgroundWorker bw = new BackgroundWorker();
+
         public Form1()
         {
             InitializeComponent();
+            bw.WorkerReportsProgress = true;
+            bw.WorkerSupportsCancellation = true;
+            bw.DoWork += new DoWorkEventHandler(bw_DoWork);
+
             //ecds
             string ecdssheet = ConfigurationManager.AppSettings["ECDS_sheet"];
             if (!string.IsNullOrEmpty(ecdssheet))
@@ -189,35 +195,41 @@ namespace HandXml2
             //{
             //    MessageBox.Show("请选择文件!");
             //}
-            bool ignoreflag = this.cb_CIPS.Checked;
-            RichTextBox txtbox = this.rtb_CIPS;
-            string floder = AppDomain.CurrentDomain.BaseDirectory + "Logs//";
-            if (Directory.Exists(floder))
+
+            if (bw.IsBusy != true)
             {
-                Directory.Delete(floder, true);
-            }
-            OpenFileDialog fileDialog = new OpenFileDialog();
-            //筛选
-            fileDialog.Multiselect = true;
-            //文件大于等于1
-            if (fileDialog.ShowDialog().Equals(DialogResult.OK) && fileDialog.FileNames.Length >= 1)
-            {
-                string[] files = fileDialog.FileNames;
-                string excelfile = files.FirstOrDefault(x => x.Trim().EndsWith(".xls", StringComparison.OrdinalIgnoreCase) || x.Trim().EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase));
-                List<string> txtfiles = files.Where(x => x.Trim().EndsWith(".txt", StringComparison.OrdinalIgnoreCase)).ToList();
-                List<string> sheets = new List<string>();
-                foreach (var item in this.cklb_CIPS.CheckedItems)
+                bool ignoreflag = this.cb_IBPS.Checked;
+                RichTextBox txtbox = this.rtb_IBPS;
+                string floder = AppDomain.CurrentDomain.BaseDirectory + "Logs//";
+                if (Directory.Exists(floder))
                 {
-                    sheets.Add(item.ToString());
+                    Directory.Delete(floder, true);
                 }
-                //显示选择文件
-                HandIBPSNEW.HandFile(txtbox, excelfile, txtfiles, sheets, ignoreflag);
+                OpenFileDialog fileDialog = new OpenFileDialog();
+                //筛选
+                fileDialog.Multiselect = true;
+                //文件大于等于1
+                if (fileDialog.ShowDialog().Equals(DialogResult.OK) && fileDialog.FileNames.Length >= 1)
+                {
+                    string[] files = fileDialog.FileNames;
+                    string excelfile = files.FirstOrDefault(x => x.Trim().EndsWith(".xls", StringComparison.OrdinalIgnoreCase) || x.Trim().EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase));
+                    List<string> txtfiles = files.Where(x => x.Trim().EndsWith(".txt", StringComparison.OrdinalIgnoreCase)).ToList();
+                    List<string> sheets = new List<string>();
+                    foreach (var item in this.cklb_IBPS.CheckedItems)
+                    {
+                        sheets.Add(item.ToString());
+                    }
+                    this.rtb_IBPS.Clear();
+                    bw.RunWorkerAsync(new FileData() { excelfile = excelfile, txtfiles = txtfiles, sheets = sheets, ignoreflag = ignoreflag });
+
+                }
+                else
+                {
+                    MessageBox.Show("请选择文件!");
+                }
 
             }
-            else
-            {
-                MessageBox.Show("请选择文件!");
-            }
+
         }
 
         private void btn_CFXPS_Click(object sender, EventArgs e)
@@ -285,7 +297,7 @@ namespace HandXml2
                     sheets.Add(item.ToString());
                 }
                 //显示选择文件
-                HandIBPSNEW.HandFile(txtbox, excelfile, txtfiles, sheets, ignoreflag);
+                HandBEPS.HandFile(txtbox, excelfile, txtfiles, sheets, ignoreflag);
 
             }
             else
@@ -318,7 +330,7 @@ namespace HandXml2
                     sheets.Add(item.ToString());
                 }
                 //显示选择文件
-                HandIBPSNEW.HandFile(txtbox, excelfile, txtfiles, sheets, ignoreflag);
+                HandHVPS.HandFile(txtbox, excelfile, txtfiles, sheets, ignoreflag);
 
             }
             else
@@ -360,42 +372,54 @@ namespace HandXml2
             }
         }
 
-        private void btn_IBPSNEW_Click(object sender, EventArgs e)
-        {
-            bool ignoreflag = this.cb_CIPS.Checked;
-            RichTextBox txtbox = this.rtb_CIPS;
-            string floder = AppDomain.CurrentDomain.BaseDirectory + "Logs//";
-            if (Directory.Exists(floder))
-            {
-                Directory.Delete(floder, true);
-            }
-            OpenFileDialog fileDialog = new OpenFileDialog();
-            //筛选
-            fileDialog.Multiselect = true;
-            //文件大于等于1
-            if (fileDialog.ShowDialog().Equals(DialogResult.OK) && fileDialog.FileNames.Length >= 1)
-            {
-                string[] files = fileDialog.FileNames;
-                string excelfile = files.FirstOrDefault(x => x.Trim().EndsWith(".xls", StringComparison.OrdinalIgnoreCase) || x.Trim().EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase));
-                List<string> txtfiles = files.Where(x => x.Trim().EndsWith(".txt", StringComparison.OrdinalIgnoreCase)).ToList();
-                List<string> sheets = new List<string>();
-                foreach (var item in this.cklb_CIPS.CheckedItems)
-                {
-                    sheets.Add(item.ToString());
-                }
-                //显示选择文件
-                HandIBPSNEW.HandFile(txtbox, excelfile, txtfiles, sheets, ignoreflag);
-
-            }
-            else
-            {
-                MessageBox.Show("请选择文件!");
-            }
-        }
-
         private void btn_CIPS_Click(object sender, EventArgs e)
         {
 
         }
+
+        public delegate void RichTextBoxUpdateEventHandler(string message, Color? color = null);
+
+        private void UpdateIBPS(string message, Color? color = null)
+        {
+            if (this.rtb_IBPS.InvokeRequired)
+            {
+                // this means we’re on the wrong thread!  
+                // use BeginInvoke or Invoke to call back on the 
+                // correct thread.
+                this.rtb_IBPS.Invoke(
+                    new RichTextBoxUpdateEventHandler(UpdateIBPS), // the method to call back on
+                    new object[] { message, color });                              // the list of arguments to pass
+            }
+            else
+            {
+                if (null != color)
+                {
+                    var defcolor = this.rtb_IBPS.ForeColor;
+                    this.rtb_IBPS.ForeColor = (Color)color;
+                    this.rtb_IBPS.WriteLine(message);
+                    this.rtb_IBPS.ForeColor = defcolor;
+                }
+                else
+                {
+                    this.rtb_IBPS.WriteLine(message);
+                }
+
+            }
+        }
+
+        private void bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            FileData data = e.Argument as FileData;
+            //显示选择文件
+            HandIBPSNEW.HandFile(UpdateIBPS, data.excelfile, data.txtfiles, data.sheets, data.ignoreflag);
+        }
+    }
+
+    public class FileData
+    {
+        public string excelfile { get; set; }
+        public List<string> txtfiles { get; set; }
+        public List<string> sheets { get; set; }
+        public bool ignoreflag { get; set; }
     }
 }

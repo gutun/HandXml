@@ -13,9 +13,8 @@ namespace HandXml2
 {
     public static class HandIBPSNEW
     {
-        public static void HandFile(System.Windows.Forms.RichTextBox textbox, string excelfile, List<string> txtfiles, List<string> sheets, bool ignoreflag)
+        public static void HandFile(Form1.RichTextBoxUpdateEventHandler textbox, string excelfile, List<string> txtfiles, List<string> sheets, bool ignoreflag)
         {
-            textbox.Clear();
             try
             {
                 DataSet dataset = new DataSet();
@@ -66,7 +65,7 @@ namespace HandXml2
                     for (int i = 0; i < resultTable.Rows.Count; i++)
                     {
                         DataRow row = resultTable.Rows[i];
-                        if (ignoreflag && ((resultTable.Columns.Contains("是否通过") && row["是否通过"].ToString().Equals("通过")) || (resultTable.Columns.Contains("是否" + Environment.NewLine + "通过") && row["是否" + Environment.NewLine + "通过"].ToString().Equals("通过"))))
+                        if (ignoreflag && ((resultTable.Columns.Contains("是否通过") && row["是否通过"].ToString().Equals("通过")) || (resultTable.Columns.Contains("是否\n通过") && row["是否\n通过"].ToString().Equals("通过"))))
                         {
                             continue;
                         }
@@ -81,7 +80,7 @@ namespace HandXml2
                         {
                             try
                             {
-                                textbox.WriteLine("验收案例编号:" + ysalbh);
+                                textbox("验收案例编号:" + ysalbh);
 
                                 if (!dbresult.ContainsKey(ysalbh))
                                 {
@@ -89,7 +88,7 @@ namespace HandXml2
                                     resultTableRow["index"] = i + titleRowIndex + 1;
                                     resultTableRow["result"] = "不通过";
                                     //不做处理
-                                    textbox.WriteLine("找不到相关的sql");
+                                    textbox("找不到相关的sql");
                                     resultTableRow["log"] = "找不到相关的sql";
                                 }
                                 else
@@ -118,14 +117,14 @@ namespace HandXml2
                                                 for (int lineindex = 0; lineindex <= itemtjnrxlines.Length - 1; lineindex++)
                                                 {
                                                     //提交内容项
-                                                    string itemtjnrx = itemtjnrxlines[lineindex].ToString();
+                                                    string itemtjnrx = itemtjnrxlines[lineindex].Replace("\n", "").Replace("\r", "").Replace(" ", "").ToString();
                                                     //提交内容	
-                                                    string itemtjnr = itemtjnrlines[lineindex].ToString();
+                                                    string itemtjnr = itemtjnrlines[lineindex].Replace("\n", "").Replace("\r", "").Replace(" ", "").ToString();
                                                     if (!string.IsNullOrEmpty(itemtjnrx) && !string.IsNullOrEmpty(itemtjnr))
                                                     {
                                                         itemtjnrx = itemtjnrx.Substring(itemtjnrx.IndexOf(')') + 1);
                                                         itemtjnrx = itemtjnrx.Replace("：", "").Replace(":", "").Trim();
-                                                        sql = CommonHelper.HandString(sql, itemtjnrx, itemtjnr);
+                                                        sql = CommonHelper.HandString(sql, "'" + itemtjnrx, itemtjnr);
                                                         if (itemIndex == 0)
                                                         {
                                                             resultTableRow["baowenbiaoshihao"] = itemtjnr;
@@ -135,19 +134,19 @@ namespace HandXml2
                                                 itemIndex++;
                                             } while (i + itemIndex < resultTable.Rows.Count && string.IsNullOrEmpty(resultTable.Rows[i + itemIndex]["验收案例编号"].ToString()));
                                         }
-                                        textbox.WriteLine("sql语句:" + sql);
+                                        textbox("sql语句:" + sql);
                                         resultTableRow["sql"] = sql;
                                         try
                                         {
                                             bool sqlResult = GetDbResult(sqlInfo[2], sql);
                                             resultTableRow["result"] = sqlResult ? "通过" : "不通过";
                                             resultTableRow["log"] = "sql执行" + sqlResult;
-                                            textbox.WriteLine("sql执行结果:" + sqlResult);
+                                            textbox("sql执行结果:" + sqlResult);
                                         } catch (Exception ex)
                                         {
                                             resultTableRow["log"] = ex.Message;
                                             resultTableRow["result"] = "不通过";
-                                            textbox.WriteLine("sql执行结果:" + ex.Message);
+                                            textbox("sql执行结果:" + ex.Message);
                                         }
                                     }
                                     else
@@ -173,9 +172,9 @@ namespace HandXml2
                                                 for (int lineindex = 0; lineindex <= itemtjnrxlines.Length - 1; lineindex++)
                                                 {
                                                     //提交内容项
-                                                    string itemtjnrx = itemtjnrxlines[lineindex].ToString();
+                                                    string itemtjnrx = itemtjnrxlines[lineindex].Replace("\n", "").Replace("\r", "").Replace(" ", "").ToString();
                                                     //提交内容	
-                                                    string itemtjnr = itemtjnrlines[lineindex].ToString();
+                                                    string itemtjnr = itemtjnrlines[lineindex].Replace("\n", "").Replace("\r", "").Replace(" ", "").ToString();
                                                     if (!string.IsNullOrEmpty(itemtjnrx) && !string.IsNullOrEmpty(itemtjnr))
                                                     {
                                                         itemtjnrx = itemtjnrx.Substring(itemtjnrx.IndexOf(')') + 1);
@@ -190,16 +189,13 @@ namespace HandXml2
                                             } while (i + itemIndex < resultTable.Rows.Count && string.IsNullOrEmpty(resultTable.Rows[i + itemIndex]["验收案例编号"].ToString()));
                                         }
                                         resultTableRow["result"] = "人工处理";
-                                        textbox.WriteLine("人工处理");
+                                        textbox("人工处理");
                                     }
-                                    textbox.WriteLine("");
+                                    textbox("");
                                 }
                             } catch (Exception exx)
                             {
-                                var defforColor = textbox.SelectionColor;
-                                textbox.SelectionColor = Color.Red;
-                                textbox.WriteLine("第" + (i + 1) + "行出错" + exx.Message);
-                                textbox.SelectionColor = defforColor;
+                                textbox("第" + (i + 1) + "行出错" + exx.Message, Color.Red);
                             }
 
                         }
@@ -224,7 +220,7 @@ namespace HandXml2
                         CommonHelper.WriteLog(table.TableName + fileType + ":" + rengonglist.Count);
                         if (fileType.Trim() == "人工处理")
                         {
-                            textbox.WriteLine(table.TableName + fileType + ":" + rengonglist.Count);
+                            textbox(table.TableName + fileType + ":" + rengonglist.Count);
                         }
                     }
                     //-----------------------
@@ -240,27 +236,27 @@ namespace HandXml2
                         CommonHelper.WriteLog(item.Field<string>("log") + Environment.NewLine);
                     }
                     CommonHelper.WriteLog(table.TableName + "错误案例:" + cwlist.Count);
-                    textbox.WriteLine(table.TableName + "错误案例:" + cwlist.Count);
+                    textbox(table.TableName + "错误案例:" + cwlist.Count);
                     //----------------
                     CommonHelper.FileName = table.TableName + "正确案例";
                     var zqlist = (from myRow in table.AsEnumerable()
                                   where !string.IsNullOrEmpty(myRow.Field<string>("result")) && myRow.Field<string>("result").Trim().Equals("通过")
                                   select myRow).ToList();
                     totalokcount += zqlist.Count;
-                    textbox.WriteLine(table.TableName + "正确案例:" + zqlist.Count);
+                    textbox(table.TableName + "正确案例:" + zqlist.Count);
                     CommonHelper.WriteLog(table.TableName + "正确案例:" + zqlist.Count);
                 }
-                //textbox.WriteLine("人工处理总数:" + totlergcount);
-                //textbox.WriteLine("失败案例总数:" + totalerrorcount);
-                //textbox.WriteLine("正确案例总数:" + totalokcount);
+                //textbox("人工处理总数:" + totlergcount);
+                //textbox("失败案例总数:" + totalerrorcount);
+                //textbox("正确案例总数:" + totalokcount);
 
 
                 SaveExcel(excelfile, resultSet);
-                textbox.WriteLine("执行结束");
+                textbox("执行结束");
 
             } catch (Exception ex)
             {
-                textbox.WriteLine(ex.Message);
+                textbox(ex.Message);
             }
         }
 
@@ -274,7 +270,8 @@ namespace HandXml2
         {
             foreach (var item in files)
             {
-                if (Path.GetFileNameWithoutExtension(item).Equals(sheetName, StringComparison.OrdinalIgnoreCase))
+                string filename = Path.GetFileNameWithoutExtension(item);
+                if (filename.Equals(sheetName, StringComparison.OrdinalIgnoreCase))
                 {
                     return item;
                 }
@@ -289,7 +286,7 @@ namespace HandXml2
         /// <returns></returns>
         private static Dictionary<string, string> ReadTxt(string file)
         {
-            string[] lines = File.ReadAllLines(file, Encoding.Default);
+            string[] lines = File.ReadAllLines(file, Encoding.UTF8);
             Dictionary<string, string> data = new Dictionary<string, string>();
             foreach (var line in lines)
             {
@@ -312,7 +309,7 @@ namespace HandXml2
 
         private static Dictionary<string, string[]> ReadResult(string file)
         {
-            string[] lines = File.ReadAllLines(file, Encoding.Default);
+            string[] lines = File.ReadAllLines(file, Encoding.UTF8);
             Dictionary<string, string[]> data = new Dictionary<string, string[]>();
             foreach (var line in lines)
             {
@@ -347,12 +344,12 @@ namespace HandXml2
                         {
                             celldb = wkSheet.Cells[x, table.Columns["是否通过"].Ordinal];
                         }
-                        else if (table.Columns.Contains("是否" + Environment.NewLine + "通过"))
+                        else if (table.Columns.Contains("是否\n通过"))
                         {
-                            celldb = wkSheet.Cells[x, table.Columns["是否" + Environment.NewLine + "通过"].Ordinal];
+                            celldb = wkSheet.Cells[x, table.Columns["是否\n通过"].Ordinal];
                         }
                         string db = row["result"].ToString();
-                        if (!string.IsNullOrEmpty(db))
+                        if (!string.IsNullOrEmpty(db) && celldb != null)
                         {
                             celldb.PutValue(db);
                             Style styleanli = celldb.GetStyle();

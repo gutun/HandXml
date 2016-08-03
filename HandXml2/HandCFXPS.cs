@@ -39,7 +39,7 @@ namespace HandXml2 {
                     //匹配Excel每一行
                     for (int i = 0; i < resultTable.Rows.Count; i++) {
                         DataRow row = resultTable.Rows[i];
-                        if (ignoreflag && ((resultTable.Columns.Contains("是否通过") && row["是否通过"].ToString().Equals("通过")) || (resultTable.Columns.Contains("是否" + Environment.NewLine + "通过") && row["是否" + Environment.NewLine + "通过"].ToString().Equals("通过")))) {
+                        if (ignoreflag && ((resultTable.Columns.Contains("是否通过") && row["是否通过"].ToString().Equals("通过")) || (resultTable.Columns.Contains("是否\n通过") && row["是否\n通过"].ToString().Equals("通过")))) {
                             continue;
                         }
                         //验收项目编号
@@ -47,12 +47,12 @@ namespace HandXml2 {
                         //if (ysalbh == "FMT100_001") {
                         //    bool flag = true;
                         //}
-                        //提交项目
-                        string tjnrx = row["提交项目"].ToString();
+                        //提交内容项
+                        string tjnrx = row["提交内容项"].ToString();
                         //提交内容	
                         string tjnr = row["提交内容"].ToString();
 
-                        if (!string.IsNullOrEmpty(ysalbh) && !string.IsNullOrEmpty(tjnrx) && !tjnrx.Trim().Equals("提交项目") && !string.IsNullOrEmpty(tjnr) && !tjnr.Trim().Equals("提交内容")) {
+                        if (!string.IsNullOrEmpty(ysalbh) && !string.IsNullOrEmpty(tjnrx) && !tjnrx.Trim().Equals("提交内容项") && !string.IsNullOrEmpty(tjnr) && !tjnr.Trim().Equals("提交内容")) {
                             try {
                                 textbox.WriteLine("验收案例编号:" + ysalbh);
 
@@ -80,13 +80,13 @@ namespace HandXml2 {
                                                 DataRow itemRow = resultTable.Rows[i + itemIndex];
                                                 //验收项目编号
                                                 string itemysalbh = itemRow["验收案例编号"].ToString();
-                                                string[] itemtjnrxlines = itemRow["提交项目"].ToString().Replace("\r", "").Split('\n').Where(x => !string.IsNullOrEmpty(x.Trim())).ToArray();
+                                                string[] itemtjnrxlines = itemRow["提交内容项"].ToString().Replace("\r", "").Split('\n').Where(x => !string.IsNullOrEmpty(x.Trim())).ToArray();
                                                 string[] itemtjnrlines = itemRow["提交内容"].ToString().Replace("\r", "").Split('\n').Where(x => !string.IsNullOrEmpty(x.Trim())).ToArray();
                                                 for (int lineindex = 0; lineindex <= itemtjnrxlines.Length - 1; lineindex++) {
-                                                    //提交项目
-                                                    string itemtjnrx = itemtjnrxlines[lineindex].Trim().ToString();
+                                                    //提交内容项
+                                                    string itemtjnrx = itemtjnrxlines[lineindex].Replace("\n", "").Replace("\r", "").Replace(" ", "").Trim().ToString();
                                                     //提交内容	
-                                                    string itemtjnr = itemtjnrlines[lineindex].Trim().ToString();
+                                                    string itemtjnr = itemtjnrlines[lineindex].Replace("\n", "").Replace("\r", "").Replace(" ", "").Trim().ToString();
                                                     if (!string.IsNullOrEmpty(itemtjnrx) && !string.IsNullOrEmpty(itemtjnr)) {
                                                         if (itemtjnrx.IndexOf(')') > -1) {
                                                             itemtjnrx = itemtjnrx.Substring(itemtjnrx.IndexOf(')') + 1);
@@ -94,7 +94,7 @@ namespace HandXml2 {
                                                             itemtjnrx = itemtjnrx.Substring(itemtjnrx.IndexOf('）') + 1);
                                                         }
                                                         itemtjnrx = itemtjnrx.Replace("：", "").Trim();
-                                                        sql = CommonHelper.HandString(sql, itemtjnrx, itemtjnr);
+                                                        sql = CommonHelper.HandString(sql, "'" + itemtjnrx, itemtjnr);
                                                         if (sql.IndexOf("CURCODE='外币种类'") > -1) {
                                                             sql = sql.Replace("CURCODE='外币种类'", "CURCODE = '" + Regex.Replace(resultTable.TableName, @"[^a-zA-Z]", "").Trim() + "'");
                                                         }
@@ -132,13 +132,13 @@ namespace HandXml2 {
                                                 DataRow itemRow = resultTable.Rows[i + itemIndex];
                                                 //验收项目编号
                                                 string itemysalbh = itemRow["验收案例编号"].ToString();
-                                                string[] itemtjnrxlines = itemRow["提交项目"].ToString().Replace("\r", "").Split('\n').Where(x => !string.IsNullOrEmpty(x.Trim())).ToArray();
+                                                string[] itemtjnrxlines = itemRow["提交内容项"].ToString().Replace("\r", "").Split('\n').Where(x => !string.IsNullOrEmpty(x.Trim())).ToArray();
                                                 string[] itemtjnrlines = itemRow["提交内容"].ToString().Replace("\r", "").Split('\n').Where(x => !string.IsNullOrEmpty(x.Trim())).ToArray();
                                                 for (int lineindex = 0; lineindex <= itemtjnrxlines.Length - 1; lineindex++) {
-                                                    //提交项目
-                                                    string itemtjnrx = itemtjnrxlines[lineindex].Trim().ToString();
+                                                    //提交内容项
+                                                    string itemtjnrx = itemtjnrxlines[lineindex].Replace("\n", "").Replace("\r", "").Replace(" ", "").Trim().ToString();
                                                     //提交内容	
-                                                    string itemtjnr = itemtjnrlines[lineindex].Trim().ToString();
+                                                    string itemtjnr = itemtjnrlines[lineindex].Replace("\n", "").Replace("\r", "").Replace(" ", "").Trim().ToString();
                                                     if (!string.IsNullOrEmpty(itemtjnrx) && !string.IsNullOrEmpty(itemtjnr)) {
                                                         if (itemtjnrx.IndexOf(')') > -1) {
                                                             itemtjnrx = itemtjnrx.Substring(itemtjnrx.IndexOf(')') + 1);
@@ -292,8 +292,8 @@ namespace HandXml2 {
                         Cell celldb = null;
                         if (table.Columns.Contains("是否通过")) {
                             celldb = wkSheet.Cells[x, table.Columns["是否通过"].Ordinal];
-                        } else if (table.Columns.Contains("是否" + Environment.NewLine + "通过")) {
-                            celldb = wkSheet.Cells[x, table.Columns["是否" + Environment.NewLine + "通过"].Ordinal];
+                        } else if (table.Columns.Contains("是否\n通过")) {
+                            celldb = wkSheet.Cells[x, table.Columns["是否\n通过"].Ordinal];
                         }
                         string db = row["result"].ToString();
                         if (!string.IsNullOrEmpty(db)) {

@@ -56,6 +56,7 @@
             this.rtb_CFXPS = new System.Windows.Forms.RichTextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.label1 = new System.Windows.Forms.Label();
             this.cklb_IBPS = new System.Windows.Forms.CheckedListBox();
             this.cb_IBPS = new System.Windows.Forms.CheckBox();
             this.btn_IBPS = new System.Windows.Forms.Button();
@@ -80,7 +81,6 @@
             this.label6 = new System.Windows.Forms.Label();
             this.rtb_ECDS = new System.Windows.Forms.RichTextBox();
             this.Tab_CIPS = new System.Windows.Forms.TabControl();
-            this.label1 = new System.Windows.Forms.Label();
             this.tabPage7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).BeginInit();
             this.splitContainer7.Panel1.SuspendLayout();
@@ -536,6 +536,16 @@
             this.splitContainer2.SplitterDistance = 82;
             this.splitContainer2.TabIndex = 13;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.ForeColor = System.Drawing.Color.Red;
+            this.label1.Location = new System.Drawing.Point(846, 59);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(275, 12);
+            this.label1.TabIndex = 17;
+            this.label1.Text = "请确保选择的Sql文件名称和上边工作簿的名称一致";
+            // 
             // cklb_IBPS
             // 
             this.cklb_IBPS.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -796,16 +806,6 @@
             this.Tab_CIPS.SelectedIndex = 0;
             this.Tab_CIPS.Size = new System.Drawing.Size(1325, 634);
             this.Tab_CIPS.TabIndex = 9;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.ForeColor = System.Drawing.Color.Red;
-            this.label1.Location = new System.Drawing.Point(846, 59);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(275, 12);
-            this.label1.TabIndex = 17;
-            this.label1.Text = "请确保选择的Sql文件名称和上边工作簿的名称一致";
             // 
             // Form1
             // 
